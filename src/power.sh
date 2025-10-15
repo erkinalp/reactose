@@ -35,7 +35,7 @@ boot() {
         grep -Fq "BOOTMGR is missing" "$QEMU_PTY" && fail="y"
       fi
       if [ -z "$fail" ]; then
-        info "Windows started successfully, visit http://127.0.0.1:8006/ to view the screen..."
+        info "ReactOS started successfully, visit http://127.0.0.1:8006/ to view the screen..."
         return 0
       fi
     fi
@@ -52,7 +52,7 @@ boot() {
 
 ready() {
 
-  [ -f "$STORAGE/windows.boot" ] && return 0
+  [ -f "$STORAGE/reactos.boot" ] && return 0
   [ ! -s "$QEMU_PTY" ] && return 1
 
   if [[ "${BOOT_MODE,,}" == "windows_legacy" ]]; then
@@ -65,7 +65,7 @@ ready() {
     return 0
   fi
 
-  local line="\"Windows Boot Manager\""
+  local line="\"ReactOS Boot\""
   grep -Fq "$line" "$QEMU_PTY" && return 0
 
   return 1
@@ -81,7 +81,7 @@ finish() {
   if [ -s "$QEMU_PID" ]; then
 
     pid=$(<"$QEMU_PID")
-    error "Forcefully terminating Windows, reason: $reason..."
+    error "Forcefully terminating ReactOS, reason: $reason..."
     { kill -15 "$pid" || true; } 2>/dev/null
 
     while isAlive "$pid"; do
@@ -91,10 +91,10 @@ finish() {
     done
   fi
 
-  if [ ! -f "$STORAGE/windows.boot" ] && [ -f "$BOOT" ]; then
+  if [ ! -f "$STORAGE/reactos.boot" ] && [ -f "$BOOT" ]; then
     # Remove CD-ROM ISO after install
     if ready; then
-      touch "$STORAGE/windows.boot"
+      touch "$STORAGE/reactos.boot"
       if [[ "$REMOVE" != [Nn]* ]]; then
         rm -f "$BOOT" 2>/dev/null || true
       fi
@@ -191,7 +191,7 @@ _graceful_shutdown() {
   fi
 
   if ! ready; then
-    info "Cannot send ACPI signal during Windows setup, aborting..."
+    info "Cannot send ACPI signal during ReactOS setup, aborting..."
     finish "$code" && return "$code"
   fi
 
@@ -208,7 +208,7 @@ _graceful_shutdown() {
     # Workaround for zombie pid
     [ ! -s "$QEMU_PID" ] && break
 
-    info "Waiting for Windows to shutdown... ($cnt/$QEMU_TIMEOUT)"
+    info "Waiting for ReactOS to shutdown... ($cnt/$QEMU_TIMEOUT)"
 
     # Send ACPI shutdown signal
     echo 'system_powerdown' | nc -q 1 -w 1 localhost "$MON_PORT" > /dev/null

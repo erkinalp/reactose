@@ -11,7 +11,7 @@ backup () {
   local iso="$1"
   local name="unknown"
   local root="$STORAGE/backups"
-  local previous="$STORAGE/windows.base"
+  local previous="$STORAGE/reactos.base"
 
   if [ -f "$previous" ]; then
 
@@ -38,7 +38,7 @@ backup () {
 
   [ -f "$iso" ] && mv -f "$iso" "$dir/"
   find "$STORAGE" -maxdepth 1 -type f -iname 'data.*' -not -iname '*.iso' -exec mv -n {} "$dir/" \;
-  find "$STORAGE" -maxdepth 1 -type f -iname 'windows.*' -not -iname '*.iso' -exec mv -n {} "$dir/" \;
+  find "$STORAGE" -maxdepth 1 -type f -iname ''reactos.*' -not -iname '*.iso' -exec mv -n {} "$dir/" \;
   find "$STORAGE" -maxdepth 1 -type f \( -iname '*.rom' -or -iname '*.vars' \) -exec mv -n {} "$dir/" \;
 
   [ -z "$(ls -A "$dir")" ] && rm -rf "$dir"
@@ -52,8 +52,8 @@ skipInstall() {
   local iso="$1"
   local method=""
   local magic byte
-  local boot="$STORAGE/windows.boot"
-  local previous="$STORAGE/windows.base"
+  local boot="$STORAGE/reactos.boot"
+  local previous="$STORAGE/reactos.base"
 
   if [ -f "$previous" ]; then
 
@@ -172,7 +172,7 @@ startInstall() {
   rm -f "$BOOT"
 
   find "$STORAGE" -maxdepth 1 -type f -iname 'data.*' -not -iname '*.iso' -delete
-  find "$STORAGE" -maxdepth 1 -type f -iname 'windows.*' -not -iname '*.iso' -delete
+  find "$STORAGE" -maxdepth 1 -type f -iname ''reactos.*' -not -iname '*.iso' -delete
   find "$STORAGE" -maxdepth 1 -type f \( -iname '*.rom' -or -iname '*.vars' \) -delete
 
   return 0
@@ -196,56 +196,56 @@ finishInstall() {
     fi
   fi
 
-  cp -f /run/version "$STORAGE/windows.ver"
+  cp -f /run/version "$STORAGE/reactos.ver"
 
   if [[ "$iso" == "$STORAGE/"* ]]; then
     if [[ "$aborted" != [Yy1]* ]] || [ -z "$CUSTOM" ]; then
       base=$(basename "$iso")
-      echo "$base" > "$STORAGE/windows.base"
+      echo "$base" > "$STORAGE/reactos.base"
     fi
   fi
 
   if [[ "${PLATFORM,,}" == "x64" ]]; then
     if [[ "${BOOT_MODE,,}" == "windows_legacy" ]]; then
-      echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+      echo "$BOOT_MODE" > "$STORAGE/reactos.mode"
       if [[ "${MACHINE,,}" != "q35" ]]; then
-        echo "$MACHINE" > "$STORAGE/windows.old"
+        echo "$MACHINE" > "$STORAGE/reactos.old"
       fi
     else
       # Enable secure boot + TPM on manual installs as Win11 requires
       if [[ "$MANUAL" == [Yy1]* || "$aborted" == [Yy1]* ]]; then
         if [[ "${DETECTED,,}" == "win11"* ]]; then
           BOOT_MODE="windows_secure"
-          echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+          echo "$BOOT_MODE" > "$STORAGE/reactos.mode"
         fi
       fi
       # Enable secure boot on multi-socket systems to workaround freeze
       if [ -n "$SOCKETS" ] && [[ "$SOCKETS" != "1" ]]; then
         BOOT_MODE="windows_secure"
-        echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+        echo "$BOOT_MODE" > "$STORAGE/reactos.mode"
       fi
     fi
   fi
 
   if [ -n "${ARGS:-}" ]; then
     ARGUMENTS="$ARGS ${ARGUMENTS:-}"
-    echo "$ARGS" > "$STORAGE/windows.args"
+    echo "$ARGS" > "$STORAGE/reactos.args"
   fi
 
   if [ -n "${VGA:-}" ] && [[ "${VGA:-}" != "virtio"* ]]; then
-    echo "$VGA" > "$STORAGE/windows.vga"
+    echo "$VGA" > "$STORAGE/reactos.vga"
   fi
 
   if [ -n "${USB:-}" ] && [[ "${USB:-}" != "qemu-xhci"* ]]; then
-    echo "$USB" > "$STORAGE/windows.usb"
+    echo "$USB" > "$STORAGE/reactos.usb"
   fi
 
   if [ -n "${DISK_TYPE:-}" ] && [[ "${DISK_TYPE:-}" != "scsi" ]]; then
-    echo "$DISK_TYPE" > "$STORAGE/windows.type"
+    echo "$DISK_TYPE" > "$STORAGE/reactos.type"
   fi
 
   if [ -n "${ADAPTER:-}" ] && [[ "${ADAPTER:-}" != "virtio-net-pci" ]]; then
-    echo "$ADAPTER" > "$STORAGE/windows.net"
+    echo "$ADAPTER" > "$STORAGE/reactos.net"
   fi
 
   rm -rf "$TMP"
@@ -286,7 +286,7 @@ findFile() {
 
   local dir file base
   local fname="$1"
-  local boot="$STORAGE/windows.boot"
+  local boot="$STORAGE/reactos.boot"
 
   dir=$(find / -maxdepth 1 -type d -iname "$fname" -print -quit)
   [ ! -d "$dir" ] && dir=$(find "$STORAGE" -maxdepth 1 -type d -iname "$fname" -print -quit)
@@ -388,7 +388,7 @@ extractESD() {
 
   wimlib-imagex export "$iso" 3 "$bootWimFile" --compress=none --boot --quiet || {
    retVal=$?
-   error "Adding Windows Setup failed" && return ${retVal}
+   error "Adding ReactOS Setup failed" && return ${retVal}
   }
 
   if [[ "${PLATFORM,,}" == "x64" ]]; then
@@ -684,7 +684,7 @@ detectImage() {
   DETECTED=$(detectVersion "$info")
 
   if [ -z "$DETECTED" ]; then
-    msg="Failed to determine Windows version from image"
+    msg="Failed to determine ReactOS version from image"
     if setXML "" || [[ "$MANUAL" == [Yy1]* ]]; then
       info "${msg}!"
     else
@@ -759,7 +759,7 @@ updateXML() {
   [ -z "$HEIGHT" ] && HEIGHT="720"
   [ -z "$WIDTH" ] && WIDTH="1280"
 
-  sed -i "s/>Windows for Docker</>$APP for $ENGINE</g" "$asset"
+  sed -i "s/>ReactOS for Docker</>$APP for $ENGINE</g" "$asset"
   sed -i "s/<VerticalResolution>1080<\/VerticalResolution>/<VerticalResolution>$HEIGHT<\/VerticalResolution>/g" "$asset"
   sed -i "s/<HorizontalResolution>1920<\/HorizontalResolution>/<HorizontalResolution>$WIDTH<\/HorizontalResolution>/g" "$asset"
 
@@ -830,7 +830,7 @@ addDriver() {
   local folder=""
 
   if [ -z "$id" ]; then
-    warn "no Windows version specified for \"$driver\" driver!" && return 0
+    warn "no ReactOS version specified for \"$driver\" driver!" && return 0
   fi
 
   case "${id,,}" in
@@ -892,7 +892,7 @@ addDrivers() {
 
   if [ -z "$version" ]; then
     version="win11x64"
-    warn "Windows version unknown, falling back to Windows 11 drivers..."
+    warn "ReactOS version unknown, falling back to Windows 11 drivers..."
   fi
 
   if ! bsdtar -xf /var/drivers.txz -C "$drivers"; then
@@ -1080,7 +1080,7 @@ buildImage() {
   local msg="Building $desc image..."
   info "$msg" && html "$msg"
 
-  [ -z "$LABEL" ] && LABEL="Windows"
+  [ -z "$LABEL" ] && LABEL="ReactOS"
 
   if [ ! -f "$dir/$ETFS" ]; then
     error "Failed to locate file \"$ETFS\" in ISO image!" && return 1
@@ -1130,50 +1130,50 @@ buildImage() {
   return 0
 }
 
-bootWindows() {
+bootReactOS() {
 
-  if [ -f "$STORAGE/windows.args" ]; then
-    ARGS=$(<"$STORAGE/windows.args")
+  if [ -f "$STORAGE/reactos.args" ]; then
+    ARGS=$(<"$STORAGE/reactos.args")
     ARGS="${ARGS//[![:print:]]/}"
     ARGUMENTS="$ARGS ${ARGUMENTS:-}"
   fi
 
-  if [ -s "$STORAGE/windows.vga" ] && [ -f "$STORAGE/windows.vga" ]; then
+  if [ -s "$STORAGE/reactos.vga" ] && [ -f "$STORAGE/reactos.vga" ]; then
     if [ -z "${VGA:-}" ]; then
-      VGA=$(<"$STORAGE/windows.vga")
+      VGA=$(<"$STORAGE/reactos.vga")
       VGA="${VGA//[![:print:]]/}"
     fi
   fi
 
-  if [ -s "$STORAGE/windows.usb" ] && [ -f "$STORAGE/windows.usb" ]; then
+  if [ -s "$STORAGE/reactos.usb" ] && [ -f "$STORAGE/reactos.usb" ]; then
     if [ -z "${USB:-}" ]; then
-      USB=$(<"$STORAGE/windows.usb")
+      USB=$(<"$STORAGE/reactos.usb")
       USB="${USB//[![:print:]]/}"
     fi
   fi
 
-  if [ -s "$STORAGE/windows.net" ] && [ -f "$STORAGE/windows.net" ]; then
+  if [ -s "$STORAGE/reactos.net" ] && [ -f "$STORAGE/reactos.net" ]; then
     if [ -z "${ADAPTER:-}" ]; then
-      ADAPTER=$(<"$STORAGE/windows.net")
+      ADAPTER=$(<"$STORAGE/reactos.net")
       ADAPTER="${ADAPTER//[![:print:]]/}"
     fi
   fi
 
-  if [ -s "$STORAGE/windows.type" ] && [ -f "$STORAGE/windows.type" ]; then
+  if [ -s "$STORAGE/reactos.type" ] && [ -f "$STORAGE/reactos.type" ]; then
     if [ -z "${DISK_TYPE:-}" ]; then
-      DISK_TYPE=$(<"$STORAGE/windows.type")
+      DISK_TYPE=$(<"$STORAGE/reactos.type")
       DISK_TYPE="${DISK_TYPE//[![:print:]]/}"
     fi
   fi
 
-  if [ -s "$STORAGE/windows.mode" ] && [ -f "$STORAGE/windows.mode" ]; then
-    BOOT_MODE=$(<"$STORAGE/windows.mode")
+  if [ -s "$STORAGE/reactos.mode" ] && [ -f "$STORAGE/reactos.mode" ]; then
+    BOOT_MODE=$(<"$STORAGE/reactos.mode")
     BOOT_MODE="${BOOT_MODE//[![:print:]]/}"
   fi
 
-  if [ -s "$STORAGE/windows.old" ] && [ -f "$STORAGE/windows.old" ]; then
+  if [ -s "$STORAGE/reactos.old" ] && [ -f "$STORAGE/reactos.old" ]; then
     if [[ "${PLATFORM,,}" == "x64" ]]; then
-      MACHINE=$(<"$STORAGE/windows.old")
+      MACHINE=$(<"$STORAGE/reactos.old")
       MACHINE="${MACHINE//[![:print:]]/}"
     fi
   fi
@@ -1188,7 +1188,7 @@ bootWindows() {
 ! detectCustom && exit 59
 
 if ! startInstall; then
-  bootWindows && return 0
+  bootReactOS && return 0
   exit 68
 fi
 
