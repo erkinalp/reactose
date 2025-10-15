@@ -50,6 +50,31 @@ get_agent() {
   return 0
 }
 
+get_latest_nightly() {
+
+  local build_type="$1"  # "bootcd" or "livecd"
+  local iso_base_url="https://iso.reactos.org"
+  local listing_url="${iso_base_url}/${build_type}/"
+  local latest_file=""
+  
+  if [[ "$build_type" == "bootcd" ]]; then
+    latest_file=$(curl -s "$listing_url" | grep -o 'href="reactos-bootcd-[^"]*-x86-gcc-lin-rel\.7z"' | tail -1 | sed 's/href="//;s/"//')
+    
+    if [ -z "$latest_file" ]; then
+      latest_file=$(curl -s "$listing_url" | grep -o 'href="reactos-bootcd-[^"]*-x86-gcc-lin-dbg\.7z"' | tail -1 | sed 's/href="//;s/"//')
+    fi
+  else
+    latest_file=$(curl -s "$listing_url" | grep -o 'href="reactos-livecd-[^"]*-x86-gcc-lin-dbg\.7z"' | tail -1 | sed 's/href="//;s/"//')
+  fi
+  
+  if [ -z "$latest_file" ]; then
+    error "Failed to find latest nightly build for $build_type!" && return 1
+  fi
+  
+  echo "${iso_base_url}/${build_type}/${latest_file}"
+  return 0
+}
+
 download_reactos() {
 
   local id="$1"
@@ -72,6 +97,14 @@ download_reactos() {
       ;;
     "reactos-0.4.14-live" )
       iso_url="${base_url}/0.4.14/ReactOS-0.4.14-release-16-gc6bf6c7-live.zip/download"
+      ;;
+    "reactos-nightly" )
+      iso_url=$(get_latest_nightly "bootcd")
+      [ $? -ne 0 ] && return 1
+      ;;
+    "reactos-nightly-live" )
+      iso_url=$(get_latest_nightly "livecd")
+      [ $? -ne 0 ] && return 1
       ;;
     * ) error "Invalid VERSION specified, value \"$id\" is not recognized!" && return 1 ;;
   esac

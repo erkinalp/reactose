@@ -97,6 +97,11 @@ kubectl apply -f https://raw.githubusercontent.com/erkinalp/reactose/refs/heads/
   | `0.4.14`  | ReactOS 0.4.14     | ~140 MB  | Boot CD  |
   | `0.4.13`  | ReactOS 0.4.13     | ~130 MB  | Boot CD  |
   | `live`    | ReactOS 0.4.15 Live| ~150 MB  | Live CD  |
+  | `nightly` | ReactOS Nightly    | ~70 MB   | Boot CD  |
+  | `nightly-live` | ReactOS Nightly Live | ~75 MB | Live CD |
+
+> [!NOTE]
+> The nightly builds are automatically fetched from the latest available build on the ReactOS build server. These builds are updated frequently and may contain experimental features or bugs. Use stable releases for production use.
 
 ### How do I change the storage location?
 

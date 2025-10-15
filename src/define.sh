@@ -43,6 +43,12 @@ parseVersion() {
     "0.4.14-live" )
       VERSION="reactos-0.4.14-live"
       ;;
+    "nightly" | "nightly-bootcd" | "reactos-nightly" )
+      VERSION="reactos-nightly"
+      ;;
+    "nightly-live" | "nightly-livecd" | "reactos-nightly-live" )
+      VERSION="reactos-nightly-live"
+      ;;
   esac
 
   return 0
@@ -145,6 +151,12 @@ printVersion() {
       ;;
     "reactos-0.4.14-live" )
       desc="ReactOS 0.4.14 Live CD"
+      ;;
+    "reactos-nightly" )
+      desc="ReactOS Nightly Build"
+      ;;
+    "reactos-nightly-live" )
+      desc="ReactOS Nightly Live CD"
       ;;
     *)
       desc="ReactOS"
@@ -279,7 +291,7 @@ validVersion() {
   local lang="$2"
 
   case "${id,,}" in
-    "reactos-0.4.15" | "reactos-0.4.14" | "reactos-0.4.13" | "reactos-0.4.15-live" | "reactos-0.4.14-live" )
+    "reactos-0.4.15" | "reactos-0.4.14" | "reactos-0.4.13" | "reactos-0.4.15-live" | "reactos-0.4.14-live" | "reactos-nightly" | "reactos-nightly-live" )
       return 0
       ;;
   esac
