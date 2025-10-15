@@ -1,6 +1,6 @@
 <h1 align="center">ReactOS<br />
 <div align="center">
-<a href="https://github.com/erkinalp/reactose"><img src="https://reactos.org/sites/default/files/ReactOS_0.png" title="Logo" style="max-width:100%;" width="128" /></a>
+<a href="https://github.com/erkinalp/reactose"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/ReactOS_logo.svg/512px-ReactOS_logo.svg.png" title="Logo" style="max-width:100%;" width="128" /></a>
 </div>
 <div align="center">
 
