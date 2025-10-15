@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-: "${APP:="Windows"}"
-: "${PLATFORM:="x64"}"
-: "${BOOT_MODE:="windows"}"
-: "${SUPPORT:="https://github.com/dockur/windows"}"
+: "${APP:="ReactOS"}"
+: "${PLATFORM:="x86"}"
+: "${BOOT_MODE:="reactos"}"
+: "${SUPPORT:="https://github.com/erkinalp/reactose"}"
 
 cd /run
 
@@ -13,7 +13,7 @@ cd /run
 . reset.sh      # Initialize system
 . server.sh     # Start webserver
 . define.sh     # Define versions
-. mido.sh       # Download Windows
+. mido.sh       # Download ReactOS
 . install.sh    # Run installation
 . disk.sh       # Initialize disks
 . display.sh    # Initialize graphics

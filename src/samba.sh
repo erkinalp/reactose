@@ -187,7 +187,7 @@ esac
 
 if [[ "${BOOT_MODE:-}" == "windows_legacy" ]]; then
 
-  # Enable NetBIOS on Windows 7 and lower
+  # Enable NetBIOS for legacy boot mode
   [[ "$DEBUG" == [Yy1]* ]] && echo "Starting NetBIOS daemon..."
 
   rm -f /var/log/samba/log.nmbd

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: windows-pvc
+  name: reactos-pvc
 spec:
   accessModes:
   - ReadWriteOnce
@@ -13,25 +13,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windows
+  name: reactos
   labels:
-    name: windows
+    name: reactos
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: windows
+      app: reactos
   template:
     metadata:
       labels:
-        app: windows
+        app: reactos
     spec:
       containers:
-      - name: windows
-        image: dockurr/windows
+      - name: reactos
+        image: erkinalp/reactose
         env:
         - name: VERSION
-          value: "11"
+          value: "0.4.15"
         - name: DISK_SIZE
           value: "64G"
         ports:
@@ -63,7 +63,7 @@ spec:
       volumes:
       - name: storage
         persistentVolumeClaim:
-          claimName: windows-pvc
+          claimName: reactos-pvc
       - hostPath:
           path: /dev/kvm
         name: dev-kvm
@@ -75,7 +75,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: windows
+  name: reactos
 spec:
   internalTrafficPolicy: Cluster
   ports:
@@ -96,5 +96,5 @@ spec:
       protocol: TCP
       targetPort: 5900
   selector:
-    app: windows
+    app: reactos
   type: ClusterIP

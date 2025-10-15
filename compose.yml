@@ -1,9 +1,9 @@
 services:
-  windows:
-    image: dockurr/windows
-    container_name: windows
+  reactos:
+    image: erkinalp/reactose
+    container_name: reactos
     environment:
-      VERSION: "11"
+      VERSION: "0.4.15"
     devices:
       - /dev/kvm
       - /dev/net/tun
@@ -14,6 +14,6 @@ services:
       - 3389:3389/tcp
       - 3389:3389/udp
     volumes:
-      - ./windows:/storage
+      - ./reactos:/storage
     restart: always
     stop_grace_period: 2m
