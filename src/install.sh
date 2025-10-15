@@ -212,18 +212,7 @@ finishInstall() {
         echo "$MACHINE" > "$STORAGE/reactos.old"
       fi
     else
-      # Enable secure boot + TPM on manual installs as Win11 requires
-      if [[ "$MANUAL" == [Yy1]* || "$aborted" == [Yy1]* ]]; then
-        if [[ "${DETECTED,,}" == "win11"* ]]; then
-          BOOT_MODE="windows_secure"
-          echo "$BOOT_MODE" > "$STORAGE/reactos.mode"
-        fi
-      fi
-      # Enable secure boot on multi-socket systems to workaround freeze
-      if [ -n "$SOCKETS" ] && [[ "$SOCKETS" != "1" ]]; then
-        BOOT_MODE="windows_secure"
-        echo "$BOOT_MODE" > "$STORAGE/reactos.mode"
-      fi
+      :
     fi
   fi
 
@@ -891,8 +880,8 @@ addDrivers() {
   info "$msg" && html "$msg"
 
   if [ -z "$version" ]; then
-    version="win11x64"
-    warn "ReactOS version unknown, falling back to Windows 11 drivers..."
+    version="winvistax64"
+    warn "ReactOS version unknown, falling back to Windows Vista drivers..."
   fi
 
   if ! bsdtar -xf /var/drivers.txz -C "$drivers"; then
