@@ -58,6 +58,36 @@ get_agent() {
   return 0
 }
 
+download_reactos() {
+
+  local id="$1"
+  local desc="$2"
+  local iso_url=""
+  local base_url="https://sourceforge.net/projects/reactos/files/ReactOS"
+
+  case "${id,,}" in
+    "reactos-0.4.15" )
+      iso_url="${base_url}/0.4.15/ReactOS-0.4.15-release-29-g67c2f3f-iso.zip/download"
+      ;;
+    "reactos-0.4.14" )
+      iso_url="${base_url}/0.4.14/ReactOS-0.4.14-release-16-gc6bf6c7-iso.zip/download"
+      ;;
+    "reactos-0.4.13" )
+      iso_url="${base_url}/0.4.13/ReactOS-0.4.13-release-40-g67b426e-iso.zip/download"
+      ;;
+    "reactos-0.4.15-live" )
+      iso_url="${base_url}/0.4.15/ReactOS-0.4.15-release-29-g67c2f3f-live.zip/download"
+      ;;
+    "reactos-0.4.14-live" )
+      iso_url="${base_url}/0.4.14/ReactOS-0.4.14-release-16-gc6bf6c7-live.zip/download"
+      ;;
+    * ) error "Invalid VERSION specified, value \"$id\" is not recognized!" && return 1 ;;
+  esac
+
+  MIDO_URL="$iso_url"
+  return 0
+}
+
 download_windows() {
 
   local id="$1"
@@ -344,6 +374,15 @@ getWindows() {
   local language edition
   language=$(getLanguage "$lang" "desc")
   edition=$(printEdition "$version" "$desc")
+
+  # Check if this is a ReactOS version
+  case "${version,,}" in
+    "reactos-"* )
+      local msg="Requesting $desc from SourceForge..."
+      info "$msg" && html "$msg"
+      download_reactos "$version" "$desc" && return 0
+      ;;
+  esac
 
   local msg="Requesting $desc from the Microsoft servers..."
   info "$msg" && html "$msg"
